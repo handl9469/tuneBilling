@@ -4,19 +4,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.billing.test.serviceImpl.priceListApiParsing;
-import com.billing.test.serviceImpl.calListPrintImpl;
-import com.billing.test.serviceImpl.explorerListApiParsing;
-import com.billing.test.vo.explorerListVO;
-import com.billing.test.vo.infoVO;
-import com.billing.test.vo.priceListVO;
+import com.billing.test.serviceImpl.PriceListApiParsing;
+import com.billing.test.serviceImpl.CalListPrintImpl;
+import com.billing.test.serviceImpl.ExplorerListApiParsing;
+import com.billing.test.vo.ExplorerListVO;
+import com.billing.test.vo.InfoVO;
+import com.billing.test.vo.PriceListVO;
 
 
 @Controller
 public class HomeController {	
     
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String getRoutePriceList(infoVO vo, priceListVO priceVo, explorerListVO evo) {	
+	public String getRoutePriceList(InfoVO vo, PriceListVO priceVo, ExplorerListVO evo) {	
 		//init Setting	
 		vo.setAccountInf();									//계정정보 설정
 		vo.setStart		 ("2021-03-01");					//서비스 시작일 설정
@@ -24,19 +24,19 @@ public class HomeController {
 		vo.setServiceCode("AmazonEC2");  				
 		vo.setServiceName("Amazon Elastic Compute Cloud");  	
 		//good
-		//"AmazonGlacier"  	"AmazonRoute53" 	"AmazonAPIGateway" 		"AWSCertificateManager"		"AmazonS3"
-		//"Amazon Glacier"  "Amazon Route 53" 	"Amazon API Gateway" 	"AWS Certificate Manager"   "Amazon Simple Storage Service"
+		//"AmazonGlacier"  	"AmazonRoute53" 	"AmazonAPIGateway" 		"AWSCertificateManager"		"AmazonCloudFront" "AmazonCloudFront"	"AmazonCloudFront"
+		//"Amazon Glacier"  "Amazon Route 53" 	"Amazon API Gateway" 	"AWS Certificate Manager"   "Amazon CloudFront" "Amazon CloudFront"  "Amazon CloudFront"
 		
 		//not good
-		// 	"AmazonCloudWatch" 문의예정	"AmazonEC2"						*필터추가예정
-		// 	"AmazonCloudWatch"			"Amazon Elastic Compute Cloud"	
+		// 	"AmazonCloudWatch" 문의예정	"AmazonEC2"				*필터추가예정		"AmazonS3"	
+		// 	"AmazonCloudWatch"			"Amazon Elastic Compute Cloud"			"Amazon Simple Storage Service"
 		
 		//서비스코드/네임 리스트화 예정
 		
-		priceListApiParsing.priceParsingJson(vo, priceVo);	// priceListJsonParsing
-		explorerListApiParsing.explorerPasingJson(vo, evo);	// explorerListParsing
-		calListPrintImpl.calList(priceVo, evo);				// 검산식 수행
-		calListPrintImpl.calPrint();						// 검산값 비교 출력
+		PriceListApiParsing.priceParsingJson(vo, priceVo);	// priceListJsonParsing
+		ExplorerListApiParsing.explorerPasingJson(vo, evo);	// explorerListParsing
+		CalListPrintImpl.calList(priceVo, evo);				// 검산식 수행
+		CalListPrintImpl.calPrint();						// 검산값 비교 출력
 		
 		
 	    return "getRoutePriceList";

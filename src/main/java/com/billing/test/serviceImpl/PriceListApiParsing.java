@@ -13,13 +13,13 @@ import com.amazonaws.services.pricing.AWSPricing;
 import com.amazonaws.services.pricing.AWSPricingClientBuilder;
 import com.amazonaws.services.pricing.model.GetProductsRequest;
 import com.amazonaws.services.pricing.model.GetProductsResult;
-import com.billing.test.vo.infoVO;
-import com.billing.test.vo.priceListVO;
+import com.billing.test.vo.InfoVO;
+import com.billing.test.vo.PriceListVO;
 
-public class priceListApiParsing {	
-	private static final Logger logger  = LoggerFactory.getLogger(priceListApiParsing.class);
+public class PriceListApiParsing {	
+	private static final Logger logger  = LoggerFactory.getLogger(PriceListApiParsing.class);
 	
-	public static void priceParsingJson(infoVO vo, priceListVO priceVo){
+	public static void priceParsingJson(InfoVO vo, PriceListVO priceVo){
 		//priceList API 값을 담을 리스트 생성
 		List<String> usagetypes		= new ArrayList<String>(); 							//사용유형
 		List<String> pricePerUnits	= new ArrayList<String>();							//단위가격

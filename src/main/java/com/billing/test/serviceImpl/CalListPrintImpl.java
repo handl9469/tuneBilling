@@ -7,17 +7,17 @@ import java.util.List;
 
 import com.amazonaws.services.costexplorer.model.Group;
 import com.amazonaws.services.costexplorer.model.ResultByTime;
-import com.billing.test.vo.explorerListVO;
-import com.billing.test.vo.priceListVO;
+import com.billing.test.vo.ExplorerListVO;
+import com.billing.test.vo.PriceListVO;
 
-public class calListPrintImpl {
+public class CalListPrintImpl {
 	
 	static List<String> 	  monTotalPriceList 	= new ArrayList<String>(); 	  	 //월별 총가격 검산 결과 리스트
  	static List<List<String>> monUsageTypePriceList = new ArrayList<List<String>>(); //월별 사용타입별 가격 검산 결과 리스트	
  	
-	public static void calList(priceListVO pvo, explorerListVO evo) {
+	public static void calList(PriceListVO pvo, ExplorerListVO evo) {
 				
-	 	//계산방식: 사용유형별 ( 양amount(double) * 리스트값pricePerUnit(double) )를 소수점 2번째자리까지 반올림 한후 총합 = Total
+	 	//계산방식: 사용유형별 ( 양amount(double) * 리스트값pricePerUnit(double) )를 총합한 후 반올림
 	 	//위와 같은 계산식이 맞는지 판별 후 적용해야함
 	 	for(ResultByTime resultByTime : evo.getResultByTimes()) {		//월별	 		
 	 		List<String> tempUsagePriceList = new ArrayList<String>(); 	//유형요금별 비교값 담을 리스트 생성(월별로 사용유형 묶음)

@@ -7,7 +7,7 @@ import com.amazonaws.services.costexplorer.model.ResultByTime;
 import lombok.Getter;
 
 @Getter
-public class explorerListVO {
+public class ExplorerListVO {
 	
 	List<ResultByTime> resultByTimes;
 	

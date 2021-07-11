@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Getter;
 
 @Getter
-public class priceListVO {
+public class PriceListVO {
 	
 	private List<String> usagetypes;
 	private List<String> beginRanges;	

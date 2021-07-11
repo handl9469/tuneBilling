@@ -4,7 +4,7 @@ package com.billing.test.vo;
 import lombok.Getter;
 
 @Getter
-public class infoVO {
+public class InfoVO {
 	
 	private String accessKey;
 	private String secretAccessKey;

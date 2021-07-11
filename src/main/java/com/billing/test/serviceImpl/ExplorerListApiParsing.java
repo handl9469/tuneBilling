@@ -19,12 +19,12 @@ import com.amazonaws.services.costexplorer.model.GetDimensionValuesRequest;
 import com.amazonaws.services.costexplorer.model.GetDimensionValuesResult;
 import com.amazonaws.services.costexplorer.model.GroupDefinition;
 import com.amazonaws.services.costexplorer.model.ResultByTime;
-import com.billing.test.vo.explorerListVO;
-import com.billing.test.vo.infoVO;
+import com.billing.test.vo.ExplorerListVO;
+import com.billing.test.vo.InfoVO;
 
-public class explorerListApiParsing {
+public class ExplorerListApiParsing {
 
-	public static void explorerPasingJson(infoVO vo, explorerListVO evo) {
+	public static void explorerPasingJson(InfoVO vo, ExplorerListVO evo) {
 		AWSCredentials 	credentials = new BasicAWSCredentials(vo.getAccessKey(),vo.getSecretAccessKey());		//AWS계정 정보 담기
 		AWSCostExplorer costExplorer = AWSCostExplorerClientBuilder.standard()
 				 												   .withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -66,7 +66,7 @@ public class explorerListApiParsing {
 	    System.out.println(resultByTimes);
 	    evo.setResultByTimes(resultByTimes);	
 	}
-	public static List<String> getcostExplorerUsageType(infoVO vo) {
+	public static List<String> getcostExplorerUsageType(InfoVO vo) {
 	      List<String> usageTypes    = new ArrayList<String>(); // 일정 기간 동안 지정된 필터에 대해 사용 가능한 모든 필터 값을 넣기 위한 String형 리스트를 생성한다.
 	      
 	      // Amazon Web Services에 요청하기 위해 AWS 자격 증명 제공을 제공하는 AWSCredentials 객체를 생성한다.
