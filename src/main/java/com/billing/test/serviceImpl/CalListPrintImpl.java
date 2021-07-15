@@ -18,7 +18,7 @@ public class CalListPrintImpl {
 	static List<String> 	  monTotalPriceList 	= new ArrayList<String>(); 	  	 //월별 총가격 검산 결과 리스트
  	static List<List<String>> monUsageTypePriceList = new ArrayList<List<String>>(); //월별 사용타입별 가격 검산 결과 리스트	
  	
-	public static void calList(AwsComDefaultVO pvo, ExplorerListVO evo,Route53VO result) {
+	public static void calList(AwsComDefaultVO pvo, ExplorerListVO evo, Route53VO result) {
 		List<String> usageTypes 			= new ArrayList<String>();
 		List<String> usageQuantitys 		= new ArrayList<String>();
 		List<String> timePeriods			= new ArrayList<String>();
@@ -42,7 +42,7 @@ public class CalListPrintImpl {
 		DateInterval timePeriod;								//검색간격
 		BigDecimal intervalAmount 		= new BigDecimal("0");	//구간사용량
 		BigDecimal pricePerUnit			= new BigDecimal("0");	//단위 가격
-		BigDecimal usageTypePrice		= new BigDecimal("0");	//사용유형 검산 금액
+		BigDecimal usageTypePrice		= new BigDecimal("0");	//사용유형 구간별 검산 금액
 		BigDecimal originUsageTypePrice = new BigDecimal("0");	//원래 사용유형 금액	
 		boolean isConfirm = false;								//검산확인
 		BigDecimal beginRange			= new BigDecimal("0");	//사용최소범위
@@ -50,8 +50,9 @@ public class CalListPrintImpl {
 		String currencyCode;									//통화
 		String unit;											//유형단위					
 		String description;										//설명
-		String location;										//리전정보
-		
+		String location;	
+		//리전정보
+		BigDecimal usageTypePriceTotal		= new BigDecimal("0");	//사용유형 검산 금액
 	 	//계산방식: 사용유형별 ( 양amount(double) * 리스트값pricePerUnit(double) )를 총합한 후 반올림
 	 	//위와 같은 계산식이 맞는지 판별 후 적용해야함
 	 	for(ResultByTime resultByTime : evo.getResultByTimes()) {		//월별	 		
@@ -63,7 +64,7 @@ public class CalListPrintImpl {
 	 		intervalAmount	= new BigDecimal("0");				//구간사용량
 	 		for(Group group : resultByTime.getGroups()) {		//월별 사용유형값
 	 			String usageTypeName = group.getKeys().get(0);	//검산할 사용유형 이름
-	 			usageTypePrice 		 = new BigDecimal("0");		//검산할 사용유형 가격 초기화	 			
+	 			usageTypePriceTotal 		 = new BigDecimal("0");		//검산할 사용유형 가격 초기화	 			
 	 			originUsageTypePrice = new BigDecimal(group.getMetrics().get("UnblendedCost").getAmount()); //Exploerer 사용유형별 요금
 	 			originUsageTypePrice = originUsageTypePrice.setScale(2, RoundingMode.HALF_UP); 				// 소수점반올림
 	 			
@@ -97,10 +98,10 @@ public class CalListPrintImpl {
 	 						}else { //최대값 범위가 INF일때
 	 							intervalAmount = usageQuantity.subtract(beginRange);
 	 							}
-	 						BigDecimal temp = intervalAmount.multiply(pricePerUnit);	//사용유형 구간별 가격
-	 						usageTypePrice = usageTypePrice.add(temp).setScale(2, RoundingMode.HALF_UP);//사용유형 가격 += 단위당가격*사용량 
-	 						if(originUsageTypePrice.equals(usageTypePrice)) isConfirm = true;
-	 						
+	 						usageTypePrice = intervalAmount.multiply(pricePerUnit);	//사용유형 구간별 가격
+	 						usageTypePriceTotal = usageTypePriceTotal.add(usageTypePrice).setScale(2, RoundingMode.HALF_UP);//사용유형 가격 += 단위당가격*사용량 
+	 						if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;
+	 						//
 	 						//리스트에 등록
 	 						usageTypes.add(usagetype);		
 	 						usageQuantitys.add(usageQuantity.toString());
@@ -121,13 +122,13 @@ public class CalListPrintImpl {
 	 				pListIdxCnt++;
 	 				}
 	 			
-	 			calTotalPrice = calTotalPrice.add(usageTypePrice);// 검사총합에 사용유형별 값 추가
+	 			calTotalPrice = calTotalPrice.add(usageTypePriceTotal);// 검사총합에 사용유형별 값 추가
 	 			//사용유형별 검산 확인
 		 		
-		 		if(originUsageTypePrice.equals(usageTypePrice)) isConfirm = true;
+		 		if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;
 		 		
 		 		
-		 		tempUsagePriceList.add("\t"+usageTypeName+"\t "+usageTypePrice.toString()+"\t"+originUsageTypePrice.toString()+" \t" +isConfirm);
+		 		tempUsagePriceList.add("\t"+usageTypeName+"\t "+usageTypePriceTotal.toString()+"\t"+originUsageTypePrice.toString()+" \t" +isConfirm);
 	 		}
 	 		
 	 		//월별 사용유형 검산값 담기
@@ -141,7 +142,7 @@ public class CalListPrintImpl {
 	 	result.setTimePeriods(timePeriods);
 	 	result.setIntervalAmount(intervalAmounts);
 	 	result.setPricePerUnits(pricePerUnits);
-	 	result.setUsageTypePrices(originUsageTypePrices);
+	 	result.setUsageTypePrices(usageTypePrices);
 	 	result.setOriginUsageTypePrices(originUsageTypePrices);
 	 	result.setIsConfirms(isConfirms);
 	 	result.setBeginRanges(beginRanges);
