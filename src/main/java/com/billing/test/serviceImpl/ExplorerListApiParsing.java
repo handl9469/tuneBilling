@@ -17,6 +17,7 @@ import com.amazonaws.services.costexplorer.model.GetCostAndUsageRequest;
 import com.amazonaws.services.costexplorer.model.GetCostAndUsageResult;
 import com.amazonaws.services.costexplorer.model.GetDimensionValuesRequest;
 import com.amazonaws.services.costexplorer.model.GetDimensionValuesResult;
+import com.amazonaws.services.costexplorer.model.Group;
 import com.amazonaws.services.costexplorer.model.GroupDefinition;
 import com.amazonaws.services.costexplorer.model.ResultByTime;
 import com.billing.test.vo.ExplorerListVO;
@@ -62,8 +63,15 @@ public class ExplorerListApiParsing {
 	    List<ResultByTime> resultByTimes = getCostAndUsageResult.getResultsByTime();
 	    
 	    //VO에 저장
+	    for(ResultByTime resultByTime : resultByTimes) {
+	    	 System.out.println(resultByTime.getTimePeriod());
+	    	 for(Group group : resultByTime.getGroups()) {
+	    		 System.out.println(group);
+	    	 }
+	    	 System.out.println();
+	    }
+	   
 	    
-	    System.out.println(resultByTimes);
 	    evo.setResultByTimes(resultByTimes);	
 	}
 	public static List<String> getcostExplorerUsageType(InfoVO vo) {
