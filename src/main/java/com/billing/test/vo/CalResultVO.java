@@ -8,12 +8,15 @@ import lombok.Getter;
 public class CalResultVO extends AwsComDefaultVO{
 	private List<String> usagetypes;
 	private List<String> usageQuantitys;
-	private List<String> timePeriods;
+	//private List<String> timePeriods;
+	private List<String> startDates;
+	private List<String> endDates;
 	private List<String> intervalAmount;
 	private List<String> pricePerUnits;
 	private List<String> usageTypePrices;
 	private List<String> originUsageTypePrices;
 	private List<String> isConfirms;
+	private List<String> usageTypePriceTotals;
 
 	// Route53
 	private List<String> routingTypes;
@@ -25,8 +28,14 @@ public class CalResultVO extends AwsComDefaultVO{
 	public void setUsageQuantitys(List<String> usageQuantitys) {
 		this.usageQuantitys = usageQuantitys;
 	}
-	public void setTimePeriods(List<String> timePeriods) {
-		this.timePeriods = timePeriods;
+//	public void setTimePeriods(List<String> timePeriods) {
+//		this.timePeriods = timePeriods;
+//	}
+	public void setStartDates(List<String> startDates) {
+		this.startDates = startDates;
+	}
+	public void setEndDates(List<String> endDates) {
+		this.endDates = endDates;
 	}
 	public void setIntervalAmount(List<String> intervalAmount) {
 		this.intervalAmount = intervalAmount;
@@ -48,5 +57,8 @@ public class CalResultVO extends AwsComDefaultVO{
 	}
 	public void setRoutingTargets(List<String> routingTargets) {
 		this.routingTargets = routingTargets;
+	}
+	public void setUsageTypePriceTotals(List<String> usageTypePriceTotals) {
+		this.usageTypePriceTotals = usageTypePriceTotals;
 	}
 }

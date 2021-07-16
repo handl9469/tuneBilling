@@ -20,10 +20,13 @@ public class CalListPrintImpl {
 	public static void calList(AwsComDefaultVO pvo, ExplorerListVO evo, CalResultVO result) {
 		List<String> usageTypes 			= new ArrayList<String>();
 		List<String> usageQuantitys 		= new ArrayList<String>();
-		List<String> timePeriods			= new ArrayList<String>();
+//		List<String> timePeriods			= new ArrayList<String>();
+		List<String> startDates				= new ArrayList<String>();
+		List<String> endDates				= new ArrayList<String>();
 		List<String> intervalAmounts		= new ArrayList<String>();
 		List<String> pricePerUnits			= new ArrayList<String>();
 		List<String> usageTypePrices		= new ArrayList<String>();
+		List<String> usageTypePriceTotals	= new ArrayList<String>();
 		List<String> originUsageTypePrices	= new ArrayList<String>();
 		List<String> isConfirms				= new ArrayList<String>();
 		
@@ -50,7 +53,8 @@ public class CalListPrintImpl {
 		String unit;											//유형단위					
 		String description;										//설명
 		String location;										//리전정보
-		
+		String startDate;
+		String endDate;
 		BigDecimal usageTypePriceTotal	= new BigDecimal("0");	//사용유형 검산 금액
 	 	BigDecimal reduceAmount			= new BigDecimal("0");	//프리티어 절감량
 		//계산방식: 사용유형별 ( 양amount(double) * 리스트값pricePerUnit(double) )를 총합한 후 반올림
@@ -58,12 +62,14 @@ public class CalListPrintImpl {
 	 	for(ResultByTime resultByTime : evo.getResultByTimes()) {		//월별	 		
 	 		List<String> tempUsagePriceList = new ArrayList<String>(); 	//유형요금별 비교값 담을 리스트 생성(월별로 사용유형 묶음)
 	 		
-	 		timePeriod = resultByTime.getTimePeriod();
+	 		timePeriod 	= resultByTime.getTimePeriod();
+	 		
 	 		calTotalPrice	= new BigDecimal("0");				//검산할 총합값 초기화
 	 		originTotalPrice= new BigDecimal("0");				//Explorer 총합값 초기화
 	 		intervalAmount	= new BigDecimal("0");				//구간사용량
 	 		for(Group group : resultByTime.getGroups()) {		//월별 사용유형값
 	 			String usageTypeName = group.getKeys().get(0);	//검산할 사용유형 이름
+	 			
 	 			usageTypePriceTotal 		 = new BigDecimal("0");		//검산할 사용유형 가격 초기화	 			
 	 			originUsageTypePrice = new BigDecimal(group.getMetrics().get("UnblendedCost").getAmount()); //Exploerer 사용유형별 요금
 	 			originUsageTypePrice = originUsageTypePrice.setScale(2, RoundingMode.HALF_UP); 				// 소수점반올림
@@ -75,6 +81,8 @@ public class CalListPrintImpl {
 	 			for(String usagetype : pvo.getUsagetypes()) {
 	 				//priceList 사용유형과 비교
 	 				if(usagetype.equals(group.getKeys().get(0)) ) {
+	 					startDate	 = timePeriod.getStart();
+	 			 		endDate 	 = timePeriod.getEnd();
 	 					currencyCode = pvo.getCurrencyCodes().get(pListIdxCnt);
 	 					unit 		 = pvo.getUnits().get(pListIdxCnt);
 	 					description  = pvo.getDescriptions().get(pListIdxCnt);
@@ -106,21 +114,24 @@ public class CalListPrintImpl {
 	 						if(reduceAmount.compareTo(intervalAmount) >= 0) {
 	 							intervalAmount = BigDecimal.ZERO;
 	 						}else {
-	 							intervalAmount = intervalAmount.subtract(reduceAmount);
+	 							intervalAmount = intervalAmount.subtract(reduceAmount); // 구간사용량 = 구간사용량 - 프리티어절감량
 	 						}	
  						usageTypePrice = intervalAmount.multiply(pricePerUnit);	//사용유형 구간별 가격
  						usageTypePriceTotal = usageTypePriceTotal.add(usageTypePrice).setScale(2, RoundingMode.HALF_UP);//사용유형 가격 += 단위당가격*사용량 
  						usageTypePriceTotal = usageTypePriceTotal.setScale(2, RoundingMode.HALF_UP); 				// 소수점반올림
- 						isConfirm = false;	
+ 						isConfirm = false;
  						if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;
  						
 	 					//리스트에 등록
  						usageTypes.add(usagetype);		
  						usageQuantitys.add(usageQuantity.toString());
- 						timePeriods.add(timePeriod.toString());		
+// 						timePeriods.add(timePeriod.toString());		
+ 						startDates.add(startDate);
+ 						endDates.add(endDate);
  						intervalAmounts.add(intervalAmount.toString()); 
  						pricePerUnits.add(pricePerUnit.toString());
  						usageTypePrices.add(usageTypePrice.toString());
+ 						usageTypePriceTotals.add(usageTypePriceTotal.toString());
  						originUsageTypePrices.add(originUsageTypePrice.toString());	
  						isConfirms.add(isConfirm+"");
  						beginRanges.add(beginRange.toString());
@@ -138,7 +149,7 @@ public class CalListPrintImpl {
 	 			calTotalPrice = calTotalPrice.add(usageTypePriceTotal);// 검사총합에 사용유형별 값 추가
 	 			
 	 			//사용유형별 검산 확인
-	 			isConfirm = false;	
+	 			isConfirm = false;
 		 		if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;
 		 		
 		 		
@@ -148,16 +159,19 @@ public class CalListPrintImpl {
 	 		//월별 사용유형 검산값 담기
 	 		monUsageTypePriceList.add(tempUsagePriceList);
 	 		//월별 총합 검산 확인
-	 		isConfirm = false;	
+	 		isConfirm = false;
 	 		if(originTotalPrice.equals(calTotalPrice)) isConfirm = true;	
 	 		monTotalPriceList.add(resultByTime.getTimePeriod() +"    "+calTotalPrice.toString()+"   \t"+originTotalPrice.toString()+" \t" +isConfirm);
 	 	}
 	 	result.setUsageTypes(usageTypes);
 	 	result.setUsageQuantitys(usageQuantitys);
-	 	result.setTimePeriods(timePeriods);
+//	 	result.setTimePeriods(timePeriods);
+	 	result.setStartDates(startDates);	 	
+	 	result.setEndDates(endDates);
 	 	result.setIntervalAmount(intervalAmounts);
 	 	result.setPricePerUnits(pricePerUnits);
 	 	result.setUsageTypePrices(usageTypePrices);
+	 	result.setUsageTypePriceTotals(usageTypePriceTotals);
 	 	result.setOriginUsageTypePrices(originUsageTypePrices);
 	 	result.setIsConfirms(isConfirms);
 	 	result.setBeginRanges(beginRanges);
@@ -171,10 +185,10 @@ public class CalListPrintImpl {
 	public static void calInfoPrint(CalResultVO vo) {
 		int cnt = 0;
 	 		System.out.println("*************************************************************************************");	
-	 		System.out.println("[1]유형타입 /[2]사용량 /[3]검색간격 /[4]구간사용량 /[5]단위가격 /[6]검산가격 /[7]원래가격 /[8]검산확인 /[9]최소범위 /[10]최대범위 /[11]통화 /[12]유형단위 /[13]리전정보 /[14]설명 ");
+	 		System.out.println("[1]시작일 /[2]종료일 /[3]유형타입 /[4]사용량 /[5]구간사용량 /[6]단위가격 /[7]구간가격 /[8]검산누적가격 /[9]청구서가격 /[10]검산확인 /[11]최소범위 /[12]최대범위 /[13]통화 /[14]유형단위 [15]리전정보 [16]설명 ");
 	 		System.out.println();
 	 		for(String str : vo.getUsagetypes()) {
-	 			System.out.println("[1]"+str +"\t[2]"+ vo.getUsageQuantitys().get(cnt)+"\t[3]"+vo.getTimePeriods().get(cnt)+"\t[4]"+ vo.getIntervalAmount().get(cnt)+"\t[5]"+ vo.getPricePerUnits().get(cnt)+"\t[6]"+ vo.getUsageTypePrices().get(cnt)+"\t[7]"+vo.getOriginUsageTypePrices().get(cnt)+"\t[8]"+vo.getIsConfirms().get(cnt)+"\t[9]"+vo.getBeginRanges().get(cnt)+"\t[10]"+vo.getEndRanges().get(cnt)+"\t[11]"+vo.getCurrencyCodes().get(cnt)+"\t[12]"+vo.getUnits().get(cnt)+"\t[13]"+vo.getLocations().get(cnt)+"\t[14]"+vo.getDescriptions().get(cnt));
+	 			System.out.println(vo.getStartDates().get(cnt)+"\t"+vo.getEndDates().get(cnt)+"\t"+str+"\t"+vo.getUsageQuantitys().get(cnt)+"\t"+vo.getIntervalAmount().get(cnt)+"\t"+ vo.getPricePerUnits().get(cnt)+"\t"+ vo.getUsageTypePrices().get(cnt)+"\t"+vo.getUsageTypePriceTotals().get(cnt)+"\t"+vo.getOriginUsageTypePrices().get(cnt)+"\t"+vo.getIsConfirms().get(cnt)+"\t"+vo.getBeginRanges().get(cnt)+"\t"+vo.getEndRanges().get(cnt)+"\t"+vo.getCurrencyCodes().get(cnt)+"\t"+vo.getUnits().get(cnt)+"\t"+vo.getLocations().get(cnt)+"\t"+vo.getDescriptions().get(cnt));
 	 			cnt++;
 	 		}
 	 		

@@ -57,7 +57,7 @@ public class FreeTierCalInfo {
 		if(usagetype.indexOf("-") >= 0) {
 			cmp2 = usagetype.substring(usagetype.indexOf("-")); //비교할 usageType -> 리전정보 제거
 		}else {
-			return reduceAmount;
+			cmp2 = ("-").concat(usagetype);
 		}
 				
 		for(String str : freeTierList) {
@@ -101,7 +101,7 @@ public class FreeTierCalInfo {
 		if(usagetype.indexOf("-") >= 0) {
 			cmp2 = usagetype.substring(usagetype.indexOf("-")); //비교할 usageType -> 리전정보 제거
 		}else {
-			return reduceAmount;
+			cmp2 = ("-").concat(usagetype);
 		}
 		
 		int pListIdxCnt=0;				

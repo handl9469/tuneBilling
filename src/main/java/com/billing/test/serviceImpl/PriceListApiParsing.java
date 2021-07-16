@@ -91,8 +91,8 @@ public class PriceListApiParsing {
 	                			 usagetypes		.add((String) attributes.get("usagetype"));	
 	                			 if(null != attributes.get("location")){
 	                				 locations  .add((String) attributes.get("location"));
-	                			 } else if(null == attributes.get("location") && null != attributes.get("toLocation")){
-	                				 locations  .add((String) attributes.get("toLocation"));
+	                			 } else if(null == attributes.get("location") && null != attributes.get("fromLocation")){
+	                				 locations  .add((String) attributes.get("fromLocation"));
 	                			 }	else {
 	                				 locations  .add("global");
 	                			 }
