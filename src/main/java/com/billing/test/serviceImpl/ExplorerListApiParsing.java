@@ -101,7 +101,7 @@ public class ExplorerListApiParsing {
 	 	            usageTypes.add(value);                                     			 // usageTypes의 리스트에 필터의 값을 넣어준다.
 	 	         }
 	         } else if(vo.getServiceName().equals("Amazon Elastic Compute Cloud")) {
-	        	 if(value.contains("APN2-EBS")) { //*필터 추가 예정							 // 필터의 값이 Out 또는 DataTransfer를 포함하는지 확인한다.
+	        	 if(value.contains("EBS")) { 											 // 필터의 값이 Out 또는 DataTransfer를 포함하는지 확인한다.
 		 	            usageTypes.add(value);                                     		 // usageTypes의 리스트에 필터의 값을 넣어준다.
 		 	         }
 	         }

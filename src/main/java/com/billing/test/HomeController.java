@@ -23,15 +23,18 @@ public class HomeController {
 		vo.setAccountInf();									//계정정보 설정
 		vo.setStart		 ("2021-03-01");					//서비스 시작일 설정
 		vo.setEnd		 ("2021-07-09");					//서비스 종료일 설정
-		vo.setServiceCode("AmazonRoute53");
-		vo.setServiceName("Amazon Route 53");
+		vo.setServiceCode("AmazonS3");
+		vo.setServiceName("Amazon Simple Storage Service");
 		//good
-		//"AmazonGlacier"  	"AmazonRoute53" 	"AmazonAPIGateway" 		"AWSCertificateManager"		"AmazonCloudFront" "AmazonCloudFront"	"AmazonCloudFront"
-		//"Amazon Glacier"  "Amazon Route 53" 	"Amazon API Gateway" 	"AWS Certificate Manager"   "Amazon CloudFront" "Amazon CloudFront"  "Amazon CloudFront"
+		//"AmazonGlacier"  	"AmazonRoute53" 	"AmazonAPIGateway" 		"AWSCertificateManager"		"AmazonCloudFront" "AmazonSES"
+		//"Amazon Glacier"  "Amazon Route 53" 	"Amazon API Gateway" 	"AWS Certificate Manager"   "Amazon CloudFront" "Amazon Simple Email Service"
+		
+		//"AmazonSQS"						"AwsDataTransfer"
+		//"Amazon Simple Queue Service"
 		
 		//not good
-		// 	"AmazonCloudWatch" 문의예정	"AmazonEC2"				*필터추가예정		"AmazonS3"					"AwsDataTransfer"
-		// 	"AmazonCloudWatch"			"Amazon Elastic Compute Cloud"			"Amazon Simple Storage Service"
+		// 	"AmazonCloudWatch" 프리티어 적용해도		"AmazonS3"							"AmazonEC2"	*필터추가예정
+		// 	"AmazonCloudWatch" 검산값이 다름		"Amazon Simple Storage Service"		"Amazon Elastic Compute Cloud"	
 		
 		//서비스코드/네임 리스트화 예정
 		

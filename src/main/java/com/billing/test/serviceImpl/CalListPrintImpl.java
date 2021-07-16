@@ -50,10 +50,11 @@ public class CalListPrintImpl {
 		String currencyCode;									//통화
 		String unit;											//유형단위					
 		String description;										//설명
-		String location;	
-		//리전정보
-		BigDecimal usageTypePriceTotal		= new BigDecimal("0");	//사용유형 검산 금액
-	 	//계산방식: 사용유형별 ( 양amount(double) * 리스트값pricePerUnit(double) )를 총합한 후 반올림
+		String location;										//리전정보
+		
+		BigDecimal usageTypePriceTotal	= new BigDecimal("0");	//사용유형 검산 금액
+	 	BigDecimal reduceAmount			= new BigDecimal("0");	//프리티어 절감량
+		//계산방식: 사용유형별 ( 양amount(double) * 리스트값pricePerUnit(double) )를 총합한 후 반올림
 	 	//위와 같은 계산식이 맞는지 판별 후 적용해야함
 	 	for(ResultByTime resultByTime : evo.getResultByTimes()) {		//월별	 		
 	 		List<String> tempUsagePriceList = new ArrayList<String>(); 	//유형요금별 비교값 담을 리스트 생성(월별로 사용유형 묶음)
@@ -72,7 +73,7 @@ public class CalListPrintImpl {
 	 			originTotalPrice = originTotalPrice.add(originUsageTypePrice).setScale(2, RoundingMode.HALF_UP);//Explore 유형요금 가져오기	 		
 	 			
 		 		int pListIdxCnt = 0; //priceList 인덱스 카운트
-	 			for(String usagetype : pvo.getUsagetypes()) {	 				
+	 			for(String usagetype : pvo.getUsagetypes()) {
 	 				//priceList 사용유형과 비교
 	 				if(usagetype.equals(group.getKeys().get(0)) ) {
 	 					currencyCode = pvo.getCurrencyCodes().get(pListIdxCnt);
@@ -86,43 +87,56 @@ public class CalListPrintImpl {
 	 					
 	 					//각 사용량 구간별 단위가격으로 나누어 합산한 가격을 usageTypePrice에 담는다.
 	 					//사용최소범위 <= 사용자 사용량
-	 					if(0 <= usageQuantity.compareTo(beginRange)){	 						
+	 					if(0 <= usageQuantity.compareTo(beginRange)){					
 	 						if(!pvo.getEndRanges().get(pListIdxCnt).equals("Inf")) { // 최대값 범위가 INF가 아닐때, 즉 최대값이 정해져 있을때
 	 							endRange   	= new BigDecimal(pvo.getEndRanges().get(pListIdxCnt));//priceList 최대범위
 	 								//사용최소범위 <= 사용자 사용량 < 사용최대범위
 		 							if(-1 == usageQuantity.compareTo(endRange)) {
-		 								intervalAmount = usageQuantity.subtract(beginRange);//사용량 = 사용자 사용량 - 사용최소범위	
-		 							}else {	//사용최대범위 <= 사용자 사용량		 								
-		 								intervalAmount = endRange.subtract(beginRange);		//사용량 = 사용최대범위 - 사용최소범위
+		 								intervalAmount = usageQuantity.subtract(beginRange);//사용량 = 사용자 사용량 - 사용최소범위
+		 								
+		 							}else {	//사용최대범위 <= 사용자 사용량
+		 								intervalAmount = endRange.subtract(beginRange);		//사용량 = 사용최대범위 - 사용최소범위		 								
 		 							}
+		 							reduceAmount = FreeTierCalInfo.FreeTierApply(pvo,usagetype,beginRange,endRange,intervalAmount); //프리티어 적용
+				 					
 	 						}else { //최대값 범위가 INF일때
-	 							intervalAmount = usageQuantity.subtract(beginRange);
-	 							}
-	 						usageTypePrice = intervalAmount.multiply(pricePerUnit);	//사용유형 구간별 가격
-	 						usageTypePriceTotal = usageTypePriceTotal.add(usageTypePrice).setScale(2, RoundingMode.HALF_UP);//사용유형 가격 += 단위당가격*사용량 
-	 						if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;
-	 						//
-	 						//리스트에 등록
-	 						usageTypes.add(usagetype);		
-	 						usageQuantitys.add(usageQuantity.toString());
-	 						timePeriods.add(timePeriod.toString());		
-	 						intervalAmounts.add(intervalAmount.toString()); 
-	 						pricePerUnits.add(pricePerUnit.toString());
-	 						usageTypePrices.add(usageTypePrice.toString());
-	 						originUsageTypePrices.add(originUsageTypePrice.toString());	
-	 						isConfirms.add(isConfirm+"");
-	 						beginRanges.add(beginRange.toString());
-	 						endRanges.add(endRange.toString());
-	 						currencyCodes.add(currencyCode);
-	 						units.add(unit);
-	 						descriptions.add(description);
-	 						locations.add(location);
+	 								intervalAmount = usageQuantity.subtract(beginRange);
+	 								reduceAmount = FreeTierCalInfo.FreeTierApply(pvo,usagetype,intervalAmount); //프리티어 적용
 	 						}
+	 						//구간량 < 프리티어절감량 => 0으로 치환
+	 						if(reduceAmount.compareTo(intervalAmount) >= 0) {
+	 							intervalAmount = BigDecimal.ZERO;
+	 						}else {
+	 							intervalAmount = intervalAmount.subtract(reduceAmount);
+	 						}	
+ 						usageTypePrice = intervalAmount.multiply(pricePerUnit);	//사용유형 구간별 가격
+ 						usageTypePriceTotal = usageTypePriceTotal.add(usageTypePrice).setScale(2, RoundingMode.HALF_UP);//사용유형 가격 += 단위당가격*사용량 
+ 						usageTypePriceTotal = usageTypePriceTotal.setScale(2, RoundingMode.HALF_UP); 				// 소수점반올림
+ 						if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;
+ 						
+	 					//리스트에 등록
+ 						usageTypes.add(usagetype);		
+ 						usageQuantitys.add(usageQuantity.toString());
+ 						timePeriods.add(timePeriod.toString());		
+ 						intervalAmounts.add(intervalAmount.toString()); 
+ 						pricePerUnits.add(pricePerUnit.toString());
+ 						usageTypePrices.add(usageTypePrice.toString());
+ 						originUsageTypePrices.add(originUsageTypePrice.toString());	
+ 						isConfirms.add(isConfirm+"");
+ 						beginRanges.add(beginRange.toString());
+ 						endRanges.add(endRange.toString());
+ 						currencyCodes.add(currencyCode);
+ 						units.add(unit);
+ 						descriptions.add(description);
+ 						locations.add(location);
 	 					}
-	 				pListIdxCnt++;
+	 					
 	 				}
+	 				pListIdxCnt++;
+	 			}
 	 			
 	 			calTotalPrice = calTotalPrice.add(usageTypePriceTotal);// 검사총합에 사용유형별 값 추가
+	 			
 	 			//사용유형별 검산 확인
 		 		
 		 		if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;

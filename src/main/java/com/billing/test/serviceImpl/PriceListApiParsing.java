@@ -50,19 +50,10 @@ public class PriceListApiParsing {
 			//nextToken validation check
 			
 			if( isNextTokenCheck == false ) {
-				if(("AwsDataTransfer").equals(vo.getServiceCode())) {
-//					//첫 실행시
-//					 getProductsRequest.getFilters().add(new Filter().withType("TERM_MATCH")
-//							 										 .withField("usageType")
-//							 										 .withValue(costExplorer.getUsageTypes()));				 
-				}else {
-					//첫 실행시	
-					getProductsRequest = new GetProductsRequest().withServiceCode(vo.getServiceCode());	//요청할 서비스코드 입력
-					getProductsResult  = pricing.getProducts(getProductsRequest);						//priceList 등록
-					logger.debug(getProductsResult.toString());
-					isNextTokenCheck 	   = true;
-				}
-				
+				getProductsRequest = new GetProductsRequest().withServiceCode(vo.getServiceCode());	//요청할 서비스코드 입력
+				getProductsResult  = pricing.getProducts(getProductsRequest);						//priceList 등록
+				logger.debug(getProductsResult.toString());
+				isNextTokenCheck 	   = true;
 			}else {	
 				//이후 실행시 NextToken 값을 이용 다음 페이지 priceList 정보 가져옴
 				getProductsRequest = new GetProductsRequest().withServiceCode(vo.getServiceCode())				//요청할 서비스코드 입력
