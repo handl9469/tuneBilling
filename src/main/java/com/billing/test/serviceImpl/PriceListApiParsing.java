@@ -9,6 +9,9 @@ import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.pricing.AWSPricing;
 import com.amazonaws.services.pricing.AWSPricingClientBuilder;
@@ -38,8 +41,9 @@ public class PriceListApiParsing {
 		List<String> descriptions	= new ArrayList<String>();	//단위 설명
 		
 		List<String> locations		= new ArrayList<String>();	//리전정보
-		
+		AWSCredentials 	credentials = new BasicAWSCredentials(vo.getAccessKey(),vo.getSecretAccessKey());		//AWS계정 정보 담기
 		AWSPricing pricing = AWSPricingClientBuilder.standard()							//엔드포인트 설정
+													.withCredentials(new AWSStaticCredentialsProvider(credentials))
 													.withRegion(Regions.US_EAST_1)  	//기본SDK 지역설정   
 													.build();		
 		GetProductsRequest getProductsRequest = new GetProductsRequest();				//요청할 priceList
@@ -54,7 +58,7 @@ public class PriceListApiParsing {
 				getProductsResult  = pricing.getProducts(getProductsRequest);						//priceList 등록
 				logger.debug(getProductsResult.toString());
 				isNextTokenCheck 	   = true;
-			}else {	
+			}else {
 				//이후 실행시 NextToken 값을 이용 다음 페이지 priceList 정보 가져옴
 				getProductsRequest = new GetProductsRequest().withServiceCode(vo.getServiceCode())				//요청할 서비스코드 입력
 															 .withNextToken(getProductsResult.getNextToken());  //가져올 페이지 토큰 입력
@@ -87,9 +91,11 @@ public class PriceListApiParsing {
 	                			 usagetypes		.add((String) attributes.get("usagetype"));	
 	                			 if(null != attributes.get("location")){
 	                				 locations  .add((String) attributes.get("location"));
-	                			 }else {
-	                				 locations  .add("");
-	                			 }	
+	                			 } else if(null == attributes.get("location") && null != attributes.get("toLocation")){
+	                				 locations  .add((String) attributes.get("toLocation"));
+	                			 }	else {
+	                				 locations  .add("global");
+	                			 }
 	                			 
 	                			 units			.add((String) priceDimensionsValue.get("unit"));
 	                			 beginRanges	.add((String) priceDimensionsValue.get("beginRange"));	

@@ -20,7 +20,8 @@ public class AwsComDefaultVO {
 	private List<String> currencyRates;
 	private List<String> descriptions;
 	
-	List<String> locations;
+	private List<String> location;
+	private List<String> locations;
 	
 	public void setServicecodes(List<String> servicecodes) {
 		this.servicecodes = servicecodes;
@@ -48,7 +49,10 @@ public class AwsComDefaultVO {
 	}
 	public void setDescriptions(List<String> descriptions) {
 		this.descriptions = descriptions;
-	}	
+	}
+	public void setLocation(List<String> location) {
+		this.location = location;
+	}
 	public void setLocations(List<String> locations) {
 		this.locations = locations;
 	}

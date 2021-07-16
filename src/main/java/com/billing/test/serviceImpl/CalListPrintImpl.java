@@ -8,17 +8,16 @@ import java.util.List;
 import com.amazonaws.services.costexplorer.model.DateInterval;
 import com.amazonaws.services.costexplorer.model.Group;
 import com.amazonaws.services.costexplorer.model.ResultByTime;
+import com.billing.test.vo.AwsComDefaultVO;
 import com.billing.test.vo.CalResultVO;
 import com.billing.test.vo.ExplorerListVO;
-import com.billing.test.vo.serviceVO.Route53VO;
-import com.billing.test.vo.AwsComDefaultVO;
 
 public class CalListPrintImpl {
 	
 	static List<String> 	  monTotalPriceList 	= new ArrayList<String>(); 	  	 //월별 총가격 검산 결과 리스트
  	static List<List<String>> monUsageTypePriceList = new ArrayList<List<String>>(); //월별 사용타입별 가격 검산 결과 리스트	
  	
-	public static void calList(AwsComDefaultVO pvo, ExplorerListVO evo, Route53VO result) {
+	public static void calList(AwsComDefaultVO pvo, ExplorerListVO evo, CalResultVO result) {
 		List<String> usageTypes 			= new ArrayList<String>();
 		List<String> usageQuantitys 		= new ArrayList<String>();
 		List<String> timePeriods			= new ArrayList<String>();
@@ -112,6 +111,7 @@ public class CalListPrintImpl {
  						usageTypePrice = intervalAmount.multiply(pricePerUnit);	//사용유형 구간별 가격
  						usageTypePriceTotal = usageTypePriceTotal.add(usageTypePrice).setScale(2, RoundingMode.HALF_UP);//사용유형 가격 += 단위당가격*사용량 
  						usageTypePriceTotal = usageTypePriceTotal.setScale(2, RoundingMode.HALF_UP); 				// 소수점반올림
+ 						isConfirm = false;	
  						if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;
  						
 	 					//리스트에 등록
@@ -138,7 +138,7 @@ public class CalListPrintImpl {
 	 			calTotalPrice = calTotalPrice.add(usageTypePriceTotal);// 검사총합에 사용유형별 값 추가
 	 			
 	 			//사용유형별 검산 확인
-		 		
+	 			isConfirm = false;	
 		 		if(originUsageTypePrice.equals(usageTypePriceTotal)) isConfirm = true;
 		 		
 		 		
@@ -148,6 +148,7 @@ public class CalListPrintImpl {
 	 		//월별 사용유형 검산값 담기
 	 		monUsageTypePriceList.add(tempUsagePriceList);
 	 		//월별 총합 검산 확인
+	 		isConfirm = false;	
 	 		if(originTotalPrice.equals(calTotalPrice)) isConfirm = true;	
 	 		monTotalPriceList.add(resultByTime.getTimePeriod() +"    "+calTotalPrice.toString()+"   \t"+originTotalPrice.toString()+" \t" +isConfirm);
 	 	}
@@ -167,7 +168,7 @@ public class CalListPrintImpl {
 	 	result.setLocations(locations);
 	}
 	
-	public static void calInfoPrint(Route53VO vo) {
+	public static void calInfoPrint(CalResultVO vo) {
 		int cnt = 0;
 	 		System.out.println("*************************************************************************************");	
 	 		System.out.println("[1]유형타입 /[2]사용량 /[3]검색간격 /[4]구간사용량 /[5]단위가격 /[6]검산가격 /[7]원래가격 /[8]검산확인 /[9]최소범위 /[10]최대범위 /[11]통화 /[12]유형단위 /[13]리전정보 /[14]설명 ");

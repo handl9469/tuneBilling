@@ -4,21 +4,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.billing.test.serviceImpl.PriceListApiParsing;
 import com.billing.test.serviceImpl.CalListPrintImpl;
 import com.billing.test.serviceImpl.ExplorerListApiParsing;
+import com.billing.test.serviceImpl.PriceListApiParsing;
+import com.billing.test.vo.AwsComDefaultVO;
 import com.billing.test.vo.CalResultVO;
 import com.billing.test.vo.ExplorerListVO;
 import com.billing.test.vo.InfoVO;
-import com.billing.test.vo.serviceVO.Route53VO;
-import com.billing.test.vo.AwsComDefaultVO;
 
 
 @Controller
 public class HomeController {	
     
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String getRoutePriceList(InfoVO vo, AwsComDefaultVO priceVo, ExplorerListVO evo,Route53VO result) {	
+	public String getRoutePriceList(InfoVO vo, AwsComDefaultVO priceVo, ExplorerListVO evo,CalResultVO result) {	
 		//init Setting	
 		vo.setAccountInf();									//계정정보 설정
 		vo.setStart		 ("2021-03-01");					//서비스 시작일 설정
