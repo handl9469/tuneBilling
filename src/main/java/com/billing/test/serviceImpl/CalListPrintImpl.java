@@ -48,7 +48,7 @@ public class CalListPrintImpl {
 		BigDecimal originUsageTypePrice = new BigDecimal("0");	//원래 사용유형 금액	
 		boolean isConfirm = false;								//검산확인
 		BigDecimal beginRange			= new BigDecimal("0");	//사용최소범위
-		BigDecimal endRange				= new BigDecimal("0");	//사용최대범위
+		BigDecimal endRange				= null;	//사용최대범위
 		String currencyCode;									//통화
 		String unit;											//유형단위					
 		String description;										//설명
@@ -94,7 +94,9 @@ public class CalListPrintImpl {
 	 					
 	 					//각 사용량 구간별 단위가격으로 나누어 합산한 가격을 usageTypePrice에 담는다.
 	 					//사용최소범위 <= 사용자 사용량
-	 					if(0 <= usageQuantity.compareTo(beginRange)){					
+	 					if(0 <= usageQuantity.compareTo(beginRange)){	
+	 						endRange = null;
+	 						
 	 						if(!pvo.getEndRanges().get(pListIdxCnt).equals("Inf")) { // 최대값 범위가 INF가 아닐때, 즉 최대값이 정해져 있을때
 	 							endRange   	= new BigDecimal(pvo.getEndRanges().get(pListIdxCnt));//priceList 최대범위
 	 								//사용최소범위 <= 사용자 사용량 < 사용최대범위
@@ -135,7 +137,8 @@ public class CalListPrintImpl {
  						originUsageTypePrices.add(originUsageTypePrice.toString());	
  						isConfirms.add(isConfirm+"");
  						beginRanges.add(beginRange.toString());
- 						endRanges.add(endRange.toString());
+ 						if(endRange == null) endRanges.add("Inf");
+ 						else endRanges.add(endRange.toString());
  						currencyCodes.add(currencyCode);
  						units.add(unit);
  						descriptions.add(description);

@@ -22,13 +22,13 @@ public class HomeController {
 		vo.setAccountInf();									//계정정보 설정
 		vo.setStart		 ("2021-03-01");					//서비스 시작일 설정
 		vo.setEnd		 ("2021-07-16");					//서비스 종료일 설정
-		vo.setServiceCode("AmazonSQS");
-		vo.setServiceName("Amazon Simple Queue Service");
+		vo.setServiceCode("AmazonS3");
+		vo.setServiceName("Amazon Simple Storage Service");
 		//good
 		//"AmazonGlacier"  	"AmazonRoute53" 	"AmazonAPIGateway" 		"AWSCertificateManager"		"AmazonCloudFront" "AmazonSES"
 		//"Amazon Glacier"  "Amazon Route 53" 	"Amazon API Gateway" 	"AWS Certificate Manager"   "Amazon CloudFront" "Amazon Simple Email Service"
 		
-		//"AmazonSQS"						"AwsDataTransfer"
+		//"AWSQueueService"						"AwsDataTransfer"
 		//"Amazon Simple Queue Service"
 		
 		//not good
