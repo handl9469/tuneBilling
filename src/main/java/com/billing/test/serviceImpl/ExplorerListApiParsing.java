@@ -63,6 +63,9 @@ public class ExplorerListApiParsing {
 	    List<ResultByTime> resultByTimes = getCostAndUsageResult.getResultsByTime();
 	    
 	    //VO에 저장
+	    
+	    System.out.println(resultByTimes.toString());
+	    
 	    for(ResultByTime resultByTime : resultByTimes) {
 	    	 System.out.println(resultByTime.getTimePeriod());
 	    	 for(Group group : resultByTime.getGroups()) {

@@ -21,9 +21,9 @@ public class HomeController {
 		//init Setting	
 		vo.setAccountInf();									//계정정보 설정
 		vo.setStart		 ("2021-03-01");					//서비스 시작일 설정
-		vo.setEnd		 ("2021-07-16");					//서비스 종료일 설정
-		vo.setServiceCode("AmazonS3");
-		vo.setServiceName("Amazon Simple Storage Service");
+		vo.setEnd		 ("2021-07-01");					//서비스 종료일 설정
+		vo.setServiceCode("AmazonCloudWatch");
+		vo.setServiceName("AmazonCloudWatch");
 		//good
 		//"AmazonGlacier"  	"AmazonRoute53" 	"AmazonAPIGateway" 		"AWSCertificateManager"		"AmazonCloudFront" "AmazonSES"
 		//"Amazon Glacier"  "Amazon Route 53" 	"Amazon API Gateway" 	"AWS Certificate Manager"   "Amazon CloudFront" "Amazon Simple Email Service"

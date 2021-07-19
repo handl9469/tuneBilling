@@ -1,7 +1,6 @@
 package com.billing.test.serviceImpl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.json.simple.JSONObject;
@@ -15,7 +14,6 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.pricing.AWSPricing;
 import com.amazonaws.services.pricing.AWSPricingClientBuilder;
-import com.amazonaws.services.pricing.model.Filter;
 import com.amazonaws.services.pricing.model.GetProductsRequest;
 import com.amazonaws.services.pricing.model.GetProductsResult;
 import com.billing.test.vo.InfoVO;

@@ -6,9 +6,9 @@ import lombok.Getter;
 
 @Getter
 public class CalResultVO extends AwsComDefaultVO{
+	
 	private List<String> usagetypes;
 	private List<String> usageQuantitys;
-	//private List<String> timePeriods;
 	private List<String> startDates;
 	private List<String> endDates;
 	private List<String> intervalAmount;
@@ -28,9 +28,6 @@ public class CalResultVO extends AwsComDefaultVO{
 	public void setUsageQuantitys(List<String> usageQuantitys) {
 		this.usageQuantitys = usageQuantitys;
 	}
-//	public void setTimePeriods(List<String> timePeriods) {
-//		this.timePeriods = timePeriods;
-//	}
 	public void setStartDates(List<String> startDates) {
 		this.startDates = startDates;
 	}
