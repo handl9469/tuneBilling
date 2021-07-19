@@ -97,11 +97,11 @@ public class CalListPrintImpl {
 	 					pricePerUnit = new BigDecimal(pvo.getCurrencyRates().get(pListIdxCnt));				//priceList Unit당 가격 담기	 					
 	 					beginRange   = new BigDecimal(pvo.getBeginRanges().get(pListIdxCnt));				//priceList 최소범위	 					
 	 					usageQuantity= new BigDecimal(group.getMetrics().get("UsageQuantity").getAmount()); //사용자 사용량
-	 					
+	 					endRange 	 = null;
 	 					//각 사용량 구간별 단위가격으로 나누어 합산한 가격을 usageTypePrice에 담는다.
 	 					//사용최소범위 <= 사용자 사용량
-	 					if(0 <= usageQuantity.compareTo(beginRange)){	
-	 						endRange = null;
+	 					if(0 <= usageQuantity.compareTo(beginRange)){
+	 						
 	 						
 	 						if(!pvo.getEndRanges().get(pListIdxCnt).equals("Inf")) { // 최대값 범위가 INF가 아닐때, 즉 최대값이 정해져 있을때
 	 							endRange   	= new BigDecimal(pvo.getEndRanges().get(pListIdxCnt));//priceList 최대범위
@@ -116,12 +116,19 @@ public class CalListPrintImpl {
 	 								intervalAmount  = usageQuantity.subtract(beginRange);
 	 								reduceAmount 	= FreeTierCalInfo.FreeTierApply(pvo,usagetype,beginRange, intervalAmount,getFreeTierList); //프리티어 적용
 	 						}
-	 						//구간량 < 프리티어절감량 => 0으로 치환
-	 						if(reduceAmount.compareTo(intervalAmount) >= 0) {
-	 							intervalAmount = BigDecimal.ZERO;
-	 						}else {
-	 							intervalAmount = intervalAmount.subtract(reduceAmount); // 구간사용량 = 구간사용량 - 프리티어절감량
-	 						}	
+	 					}else { //사용최소범위 > 사용자 사용량
+	 						intervalAmount	= BigDecimal.ZERO;
+	 						usageQuantity 	= BigDecimal.ZERO;
+	 						reduceAmount 	= BigDecimal.ZERO;
+	 						if(!pvo.getEndRanges().get(pListIdxCnt).equals("Inf"))
+	 							endRange 		= new BigDecimal(pvo.getEndRanges().get(pListIdxCnt));
+	 					}
+	 					//구간량 < 프리티어절감량 => 0으로 치환
+ 						if(reduceAmount.compareTo(intervalAmount) >= 0) {
+ 							intervalAmount = BigDecimal.ZERO;
+ 						}else {
+ 							intervalAmount = intervalAmount.subtract(reduceAmount); // 구간사용량 = 구간사용량 - 프리티어절감량
+ 						}	
  						usageTypePrice 		= intervalAmount.multiply(pricePerUnit);	//사용유형 구간별 가격
  						usageTypePriceTotal = usageTypePriceTotal.add(usageTypePrice);
  						usageTypePriceTotal = usageTypePriceTotal.setScale(2, RoundingMode.HALF_UP);//사용유형 가격 += 단위당가격*사용량 
@@ -146,10 +153,7 @@ public class CalListPrintImpl {
  						locations				.add(location);
  						beginRanges				.add(beginRange.toString());
  						if(endRange == null) 	endRanges.add("Inf");	//구간 최대범위가 Inf일시 String Inf값 입력
- 						else 					endRanges.add(endRange.toString());					
- 						
-	 					}
-	 					
+ 						else 					endRanges.add(endRange.toString());
 	 				}
 	 				pListIdxCnt++;
 	 			}	 			
@@ -168,6 +172,9 @@ public class CalListPrintImpl {
 	 		if(originTotalPrice.equals(calTotalPrice)) isConfirm = true;	
 	 		monTotalPriceList.add(resultByTime.getTimePeriod() +"    "+calTotalPrice.toString()+"   \t"+originTotalPrice.toString()+" \t" +isConfirm);
 	 	}
+	 	
+	 	
+	 	
 	 	result.setServicecodes			(servicecodes);
 	 	result.setUsageTypes			(usageTypes);
 	 	result.setUsageQuantitys		(usageQuantitys);
