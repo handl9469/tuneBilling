@@ -24,21 +24,10 @@ public class PriceListApiParsing {
 	
 	
 	
-	public static void priceParsingJson(InfoVO vo, AwsComDefaultVO priceVo){
-		//priceList API 값을 담을 리스트 생성	
-		//Common Product
-		List<String> servicecodes 	= new ArrayList<String>();	//서비스코드
-		List<String> servicenames 	= new ArrayList<String>();	//서비스네임
-		List<String> usagetypes		= new ArrayList<String>();	//사용유형 
-		//Common Terms
-		List<String> units			= new ArrayList<String>();	 
-		List<String> beginRanges	= new ArrayList<String>();	//사용유형 최소범위
-		List<String> endRanges		= new ArrayList<String>();	//사용유형 최대범위
-		List<String> currencyCodes	= new ArrayList<String>();	//화폐
-		List<String> currencyRates	= new ArrayList<String>();	//단위가격		
-		List<String> descriptions	= new ArrayList<String>();	//단위 설명
+	public static List<AwsComDefaultVO> priceParsingJson(InfoVO vo){
+		AwsComDefaultVO 	  priceVo   = new AwsComDefaultVO();
+		List<AwsComDefaultVO> priceList = new ArrayList<AwsComDefaultVO>();
 		
-		List<String> locations		= new ArrayList<String>();	//리전정보
 		AWSCredentials 	credentials = new BasicAWSCredentials(vo.getAccessKey(),vo.getSecretAccessKey());		//AWS계정 정보 담기
 		AWSPricing pricing = AWSPricingClientBuilder.standard()							//엔드포인트 설정
 													.withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -84,80 +73,36 @@ public class PriceListApiParsing {
 	                		 for(Object priceDimensionskey : priceDimensions.keySet()) {
 	                			 JSONObject priceDimensionsValue = (JSONObject) priceDimensions.get(priceDimensionskey);
 	                			 JSONObject pricePerUnitMap = (JSONObject) priceDimensionsValue.get("pricePerUnit");	
-	                			 servicecodes	.add((String) attributes.get("servicecode"));
-	                			 servicenames	.add((String) attributes.get("servicename"));
-	                			 usagetypes		.add((String) attributes.get("usagetype"));	
+	                			 
+	                			 priceVo = new AwsComDefaultVO();
+	                			 priceVo.setServicecode((String) attributes.get("servicecode"));
+	                			 priceVo.setServicename((String) attributes.get("servicename"));	
+	                			 priceVo.setUsagetype  ((String) attributes.get("usagetype"));	
 	                			 if(null != attributes.get("location")){
-	                				 locations  .add((String) attributes.get("location"));
+	                				 priceVo.setLocation((String) attributes.get("location")); 
 	                			 } else if(null == attributes.get("location") && null != attributes.get("fromLocation")){
-	                				 locations  .add((String) attributes.get("fromLocation"));
+	                				 priceVo.setLocation((String) attributes.get("fromLocation")); 
 	                			 }	else {
-	                				 locations  .add("global");
+	                				 priceVo.setLocation("global");
 	                			 }
 	                			 
-	                			 units			.add((String) priceDimensionsValue.get("unit"));
-	                			 beginRanges	.add((String) priceDimensionsValue.get("beginRange"));	
-	                			 endRanges		.add((String) priceDimensionsValue.get("endRange"));	  
-	                			 currencyCodes	.add((String) pricePerUnitMap.keySet().toString());	                			
-	                			 currencyRates	.add((String) pricePerUnitMap.values().toArray()[0]);	                			
-	                			 descriptions	.add((String) priceDimensionsValue.get("description"));
+	                			 priceVo.setUnit		((String) priceDimensionsValue.get("unit"));
+	                			 priceVo.setBeginRange	((String) priceDimensionsValue.get("beginRange"));	
+	                			 priceVo.setEndRange	((String) priceDimensionsValue.get("endRange"));	  
+	                			 priceVo.setCurrencyCode((String) pricePerUnitMap.keySet().toString());	                			
+	                			 priceVo.setCurrencyRate((String) pricePerUnitMap.values().toArray()[0]);	                			
+	                			 priceVo.setDescription	((String) priceDimensionsValue.get("description"));
 	                			 
+	                			 priceList.add(priceVo);
 	                		 }
 	                	 }
 	                 }
-	                 
-	                 //VO에 저장
-	                 //Common Product
-	                 priceVo.setServicecodes	(servicecodes);
-	                 priceVo.setServicenames	(servicenames);
-	                 priceVo.setUsagetypes		(usagetypes);	
-	                 //Common Terms
-	                 priceVo.setUnits			(units);       
-	                 priceVo.setBeginRanges		(beginRanges);
-	                 priceVo.setEndRanges		(endRanges);	
-	                 priceVo.setCurrencyCodes	(currencyCodes);
-	                 priceVo.setCurrencyRates	(currencyRates);	                 
-	                 priceVo.setDescriptions	(descriptions);	
-	                 priceVo.setLocations		(locations);
                  }catch (Exception e) {
 	                 logger.error("Parsing Exception {}", e.getMessage(), e);
 	             }
 	        }
 		}while(null != getProductsResult.getNextToken()); //NextToken 없을시 종료
+		return priceList;
 	}
 	
-//	public static void doParse(JSONObject temp) {
-//		JSONObject tempValue = new JSONObject();
-//		
-//		for(Object tempKey : temp.keySet()) {				
-//			
-//			tempValue = (JSONObject) temp.get(tempKey);		
-//			//attributes
-//			if(null != ((HashMap) tempValue).get("attributes")) {
-//				JSONObject attributes = (JSONObject) tempValue.get("attributes");
-//				servicecodes.add((String) attributes.get("servicecode"));
-//				servicenames.add((String) attributes.get("servicename"));
-//				usagetypes	.add((String) attributes.get("usagetype"));	
-//				
-//			}
-//			//priceDimensions
-//			if(null != ((HashMap) tempValue).get("priceDimensions")) {
-//				for(Object priceDimensionskey : tempValue.keySet()) {
-//					JSONObject priceDimensions = (JSONObject) tempValue.get(priceDimensionskey);       			 
-//					JSONObject pricePerUnitMap = (JSONObject) priceDimensions.get("pricePerUnit");	                         
-//					units		 .add((String) priceDimensions.get("unit"));
-//					beginRanges	 .add((String) priceDimensions.get("beginRange"));	
-//					endRanges	 .add((String) priceDimensions.get("endRange"));	       			
-//					descriptions .add((String) priceDimensions.get("description"));
-//	       			pricePerUnits.add((String) pricePerUnitMap.values().toArray()[0]); //통화가 다르게 들어올 수 있으므로 인덱스값으로 가져옴
-//	       		}
-//			}
-//			if(null == (JSONObject) temp.get(tempKey)) break; // 더이상 키가 없을시 종료
-//			
-//			if(null != ((HashMap) tempValue).get("NextToken")) break;
-//				
-//			
-//		}
-//		
-//	}
 }

@@ -1,17 +1,10 @@
 package com.billing.test.vo;
 
-import java.util.List;
+import lombok.Data;
 
-import com.amazonaws.services.costexplorer.model.ResultByTime;
-
-import lombok.Getter;
-
-@Getter
+@Data
 public class ExplorerListVO {
 	
-	List<ResultByTime> resultByTimes;
+	String resultByTime;
 	
-	public void setResultByTimes(List<ResultByTime> resultByTimes) {
-		this.resultByTimes = resultByTimes;
-	}
 }

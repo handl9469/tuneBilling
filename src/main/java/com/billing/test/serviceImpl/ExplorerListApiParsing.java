@@ -25,7 +25,7 @@ import com.billing.test.vo.InfoVO;
 
 public class ExplorerListApiParsing {
 
-	public static void explorerPasingJson(InfoVO vo, ExplorerListVO evo) {
+	public static List<ResultByTime> explorerPasingJson(InfoVO vo, ExplorerListVO evo) {
 		AWSCredentials 	credentials = new BasicAWSCredentials(vo.getAccessKey(),vo.getSecretAccessKey());		//AWS계정 정보 담기
 		AWSCostExplorer costExplorer = AWSCostExplorerClientBuilder.standard()
 				 												   .withCredentials(new AWSStaticCredentialsProvider(credentials))
@@ -37,7 +37,12 @@ public class ExplorerListApiParsing {
 		if("AwsDataTransfer".equals(vo.getServiceName()) || "Amazon Elastic Compute Cloud".equals(vo.getServiceName()) ){
 			dimensionValues = new DimensionValues().withKey	("USAGE_TYPE")							//키값 설정
 					   							  .withValues(getcostExplorerUsageType(vo));	
-		}else {
+		}else if("S3 Glacier Deep Archive".equals(vo.getServiceName())){
+			dimensionValues = new DimensionValues().withKey("USAGE_TYPE")
+												   .withValues(getcostExplorerUsageType(vo));
+			
+		}
+		else {
 			dimensionValues = new DimensionValues().withKey	("SERVICE")							//키값 설정
 					.withValues(vo.getServiceName());			//서비스네임
 		}
@@ -75,7 +80,7 @@ public class ExplorerListApiParsing {
 	    }
 	   
 	    
-	    evo.setResultByTimes(resultByTimes);	
+	    return resultByTimes;	
 	}
 	public static List<String> getcostExplorerUsageType(InfoVO vo) {
 	      List<String> usageTypes    = new ArrayList<String>(); // 일정 기간 동안 지정된 필터에 대해 사용 가능한 모든 필터 값을 넣기 위한 String형 리스트를 생성한다.
@@ -107,6 +112,10 @@ public class ExplorerListApiParsing {
 	        	 if(value.contains("EBS")) { 											 // 필터의 값이 Out 또는 DataTransfer를 포함하는지 확인한다.
 		 	            usageTypes.add(value);                                     		 // usageTypes의 리스트에 필터의 값을 넣어준다.
 		 	         }
+	         } else if(vo.getServiceName().equals("S3 Glacier Deep Archive")) {
+	        	 if(value.contains("GLACIER") || value.contains("Glacier")) {
+	        		 usageTypes.add(value);    
+	        	 }
 	         }
 	      }
 	      
